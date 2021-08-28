@@ -39,19 +39,14 @@ namespace basicapi.Controllers
             .ToArray();
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("asd/{id}")]
         public async Task<ActionResult<WeatherForecast>> GetTodoItem(long id)
         {
             string siteContent = string.Empty;
-
-      
             string url = "https://www.haberturk.com/havadurumu/Turkiye-TR/Istanbul/LTSI";
-
-          
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.AutomaticDecompression = DecompressionMethods.GZip;
 
-            
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())  // Go query google
             using (Stream responseStream = response.GetResponseStream())               // Load the response stream
             using (StreamReader streamReader = new StreamReader(responseStream))       // Load the stream reader to read the response
@@ -81,5 +76,37 @@ namespace basicapi.Controllers
         }
 
 
-    }
+        [HttpGet("cur/{type}")]
+        public async Task<ActionResult<WeatherForecast>> Curreny(string type)
+        {
+          string siteContent = string.Empty;
+            string url = "https://www.bloomberght.com/doviz/dolar";
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.AutomaticDecompression = DecompressionMethods.GZip;
+
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())  // Go query google
+            using (Stream responseStream = response.GetResponseStream())               // Load the response stream
+            using (StreamReader streamReader = new StreamReader(responseStream))       // Load the stream reader to read the response
+            {
+                siteContent = streamReader.ReadToEnd(); // Read the entire response and store it in the siteContent variable
+            }
+
+            int firstStringPosition = siteContent.IndexOf("widget-interest-detail type1");
+              int secondStringPosition = siteContent.IndexOf("DİĞER HABERLER");
+              string stringBetweenTwoStrings = siteContent.Substring(firstStringPosition,
+                  secondStringPosition - firstStringPosition);
+              Regex regex = new Regex("([0-9],[0-9]{4})");
+               Match match = regex.Match(stringBetweenTwoStrings);
+
+               if (match.Success)
+               {
+                   return Ok(match.Groups[1].Value);
+               }
+
+            return Ok(stringBetweenTwoStrings);
+        }
+
+
+
+        }
 }

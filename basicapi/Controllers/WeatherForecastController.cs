@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -107,6 +110,24 @@ namespace basicapi.Controllers
         }
 
 
+        [HttpGet("token")]
+        public async Task<ActionResult<WeatherForecast>> token(string type)
+        {
 
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ThisismySecretKey"));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken("Test.com",
+             "Test.com",
+              null,
+              expires: DateTime.Now.AddMinutes(120),
+              signingCredentials: credentials);
+
+            return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+           
         }
+
+
+
+    }
 }
